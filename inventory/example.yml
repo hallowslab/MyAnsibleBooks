@@ -1,0 +1,9 @@
+home:
+  hosts:
+    remotehost:
+      ansible_host: 123.45.678.90
+      ansible_user: MyAdmin
+
+    local:
+      ansible_connection: local
+      ansible_user: LocalUser
