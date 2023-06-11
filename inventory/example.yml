@@ -34,3 +34,4 @@ physical:
 virtual:
   children:
     vms:
+    docker:
