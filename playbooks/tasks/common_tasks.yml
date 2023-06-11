@@ -1,0 +1,29 @@
+- name: Upgrade ARCH packages
+  when: ansible_distribuition == 'ArchLinux'
+  become: true
+  community.general.pacman:
+    update_cache: true
+    upgrade: true
+
+- name: Upgrade DEBIAN packages
+  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+  become: true
+  ansible.builtin.apt:
+    name: "*"
+    state: latest
+    update_cache: yes
+
+- name: Upgrade CENTOS packages
+  when: ansible_distribution == 'CentOS'
+  become: true
+  ansible.builtin.yum:
+    name: "*"
+    state: latest
+    update_cache: true
+
+- name: Upgrade ALPINE packages
+  when: ansible_distribution == 'Alpine'
+  become: true
+  community.general.apk:
+    upgrade: true
+    update_cache: true
