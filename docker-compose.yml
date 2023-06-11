@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  ubuntu_ssh:
+    build:
+      context: ./dockerfiles/ubuntu
+      dockerfile: dockerfile
+    ports:
+      - 2222:22
+
+  alpine_ssh:
+    build:
+      context: ./dockerfiles/alpine
+      dockerfile: dockerfile
+    ports:
+      - 2223:22
+
+  centos_ssh:
+    build:
+      context: ./dockerfiles/centos
+      dockerfile: dockerfile
+    ports:
+      - 2224:22
+

@@ -1,0 +1,17 @@
+FROM ubuntu:latest
+
+RUN apt update && apt install openssh-server -y
+
+# Modify ssh config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+RUN sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+RUN sed -i 's/^#AuthorizedKeysFile/AuthorizedKeysFile/' /etc/ssh/sshd_config
+
+# Create required directory
+RUN mkdir /var/run/sshd
+# Copy authorized_keys file
+COPY authorized_keys /root/.ssh/authorized_keys
+# Expose docker port 22
+EXPOSE 22
+# Start SSH service
+CMD ["/usr/sbin/sshd","-D"]

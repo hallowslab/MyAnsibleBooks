@@ -1,0 +1,19 @@
+FROM alpine:latest
+
+# add openssh and clean
+RUN apk add --update openssh python3 \
+&& rm  -rf /tmp/* /var/cache/apk/*
+
+# Modify ssh config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+RUN sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+RUN sed -i 's/^#AuthorizedKeysFile/AuthorizedKeysFile/' /etc/ssh/sshd_config
+
+# Generate SSH host keys
+RUN ssh-keygen -A
+
+# Add authorized_keys file
+COPY authorized_keys /root/.ssh/authorized_keys
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]
