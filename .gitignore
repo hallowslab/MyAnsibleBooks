@@ -1,1 +1,4 @@
 inventory/main.yml
+.vscode
+encrypted_*.yml
+authorized_keys

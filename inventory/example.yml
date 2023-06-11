@@ -1,9 +1,36 @@
-home:
+all:
   hosts:
-    remotehost:
-      ansible_host: 123.45.678.90
-      ansible_user: MyAdmin
-
     local:
       ansible_connection: local
       ansible_user: LocalUser
+      ansible_become_password: 1234567890
+  children:
+    internal:
+      hosts:
+        remotehost:
+          ansible_host: 123.45.678.90
+          ansible_user: MyAdmin
+    vms:
+      hosts:
+        vmone.local:
+        vmtwo.local:
+    docker:
+      hosts:
+        ubuntuD:
+          ansible_host: 127.0.0.1
+          ansible_port: 2222
+          ansible_user: root
+        alpineD:
+          ansible_host: 127.0.0.1
+          ansible_port: 2223
+          ansible_user: root
+        centosD:
+          ansible_host: 127.0.0.1
+          ansible_port: 2224
+          ansible_user: root
+physical:
+  children:
+    internal:
+virtual:
+  children:
+    vms:
