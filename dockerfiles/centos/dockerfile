@@ -6,7 +6,7 @@ RUN sed -i 's|#baseurl=http://mirror.centos.org|baseurl=http://vault.centos.org|
 
 
 # Install SSH server
-RUN yum install -y openssh-server python3 && \
+RUN yum install -y openssh-server python3 cronie && \
     yum clean all
 
 # Modify ssh config

@@ -1,6 +1,6 @@
 FROM ubuntu:latest
 
-RUN apt update && apt install openssh-server -y
+RUN apt update && apt install openssh-server sudo cron -y
 
 # Modify ssh config
 RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
