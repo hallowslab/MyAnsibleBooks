@@ -1,0 +1,19 @@
+FROM fedora:latest
+
+# Install required packages
+RUN dnf update -y && dnf install -y openssh-server cronie
+
+# Modify ssh config
+RUN sed -i 's/#PasswordAuthentication yes/PasswordAuthentication no/' /etc/ssh/sshd_config
+RUN sed -i 's/#PubkeyAuthentication yes/PubkeyAuthentication yes/' /etc/ssh/sshd_config
+RUN sed -i 's/^#AuthorizedKeysFile/AuthorizedKeysFile/' /etc/ssh/sshd_config
+
+# Generate SSH host keys
+RUN ssh-keygen -A
+
+# Add authorized_keys file
+COPY authorized_keys /root/.ssh/authorized_keys
+
+
+EXPOSE 22
+CMD ["/usr/sbin/sshd", "-D"]

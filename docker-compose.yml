@@ -1,6 +1,13 @@
 version: '3'
 
 services:
+  fedora_ssh:
+    build:
+      context: ./dockerfiles/fedora
+      dockerfile: dockerfile
+    ports:
+      - 2221:22
+
   ubuntu_ssh:
     build:
       context: ./dockerfiles/ubuntu
