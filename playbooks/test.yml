@@ -1,0 +1,40 @@
+- name: Debug Distribution
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Display Distribution
+      debug:
+        var: ansible_distribution
+    
+    - name: Display password
+      debug:
+        var: ansible_become_password
+      
+    - name: Get crons
+      command: crontab -l
+      register: existing_crons
+      changed_when: false
+      ignore_errors: true
+
+    - name: Display Cronjobs
+      debug:
+        var: existing_crons
+      when: existing_crons is succeeded
+    
+    - name: Get root crons
+      become: true
+      command: crontab -l
+      register: existing_root_crons
+      changed_when: false
+      ignore_errors: true
+
+    - name: Does not have rkhunter update
+      debug:
+        msg: Does not have rkhunter update cronjob
+      when: (existing_root_crons is succeeded and not existing_root_crons.stdout_lines is search("rkhunter --cronjob --update --quiet")) or existing_root_crons.stderr == "no crontab for root"
+
+    - name: Has clamdscan
+      debug:
+        msg: Has clamdscan
+      when: existing_crons is succeeded and existing_crons.stdout_lines is search("clamdscan")

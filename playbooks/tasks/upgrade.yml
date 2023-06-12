@@ -3,7 +3,7 @@
   become: true
   community.general.pacman:
     update_cache: true
-    upgrade: true
+    upgrade: yes
 
 - name: Upgrade DEBIAN packages
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
@@ -11,7 +11,7 @@
   ansible.builtin.apt:
     name: "*"
     state: latest
-    update_cache: yes
+    update_cache: true
 
 - name: Upgrade CENTOS packages
   when: ansible_distribution == 'CentOS'
@@ -25,5 +25,11 @@
   when: ansible_distribution == 'Alpine'
   become: true
   community.general.apk:
-    upgrade: true
+    upgrade: yes
     update_cache: true
+
+- name: Update all software (dnf)
+  when: ansible_distribuition == 'Fedora'
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
