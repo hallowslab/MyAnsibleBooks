@@ -1,10 +1,4 @@
-- name: Upgrade ARCH packages
-  when: ansible_distribuition == 'ArchLinux'
-  become: true
-  community.general.pacman:
-    update_cache: true
-    upgrade: yes
-
+---
 - name: Upgrade DEBIAN packages
   when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
   become: true
@@ -21,15 +15,22 @@
     state: latest
     update_cache: true
 
+- name: Upgrade FEDORA packages
+  when: ansible_distribuition == 'Fedora'
+  ansible.builtin.dnf:
+    name: "*"
+    state: latest
+
+- name: Upgrade ARCH packages
+  when: ansible_distribuition == 'ArchLinux'
+  become: true
+  community.general.pacman:
+    update_cache: true
+    upgrade: yes
+
 - name: Upgrade ALPINE packages
   when: ansible_distribution == 'Alpine'
   become: true
   community.general.apk:
     upgrade: yes
     update_cache: true
-
-- name: Update all software (dnf)
-  when: ansible_distribuition == 'Fedora'
-  ansible.builtin.dnf:
-    name: "*"
-    state: latest
