@@ -2,7 +2,7 @@
 ---
 
 - name: 'NTP | Include OS-specific variables.'
-  include_vars: '{{ ansible_os_family }}.yml'
+  include_vars: '{{ ansible_distribuition }}.yml'
 
 - name: 'NTP | Define service name'
   set_fact:

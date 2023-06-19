@@ -1,6 +1,6 @@
 ---
 # handlers file for ntp-role
-- name: 'restart ntp'
+- name: 'NTP | Service restart'
   become: yes
   service:
     name: '{{ ntp_service_name }}'

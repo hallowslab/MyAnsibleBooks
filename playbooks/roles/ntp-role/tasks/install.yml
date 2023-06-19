@@ -1,0 +1,40 @@
+---
+- name: 'NTP | Install Debian packages'
+  when: ansible_os_family == 'Debian'
+  become: true
+  apt:
+    name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
+    state: '{{ item.state | default(omit) }}'
+  with_items: '{{ ntp_packages }}'
+
+- name: 'NTP | Install CENTOS packages'
+  when: ansible_distribuition == 'CentOS'
+  become: true
+  yum:
+    name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
+    state: '{{ item.state | default(omit) }}'
+  with_items: '{{ ntp_packages }}'
+
+- name: 'NTP | Install FEDORA packages'
+  when: ansible_distribuition == 'Fedora'
+  become: true
+  dnf:
+    name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
+    state: '{{ item.state | default(omit) }}'
+  with_items: '{{ ntp_packages }}'
+
+- name: Install ARCH package
+  when: ansible_os_family == 'Archlinux'
+  become: true
+  community.general.pacman:
+    name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
+    state: '{{ item.state | default(omit) }}'
+  with_items: '{{ ntp_packages }}'
+
+- name: Install ALPINE package
+  when: ansible_os_family == 'Alpine'
+  become: true
+  community.general.apk:
+    name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
+    state: '{{ item.state | default(omit) }}'
+  with_items: '{{ ntp_packages }}'
