@@ -1,0 +1,22 @@
+
+---
+
+- name: 'NTP | Include OS-specific variables.'
+  include_vars: '{{ ansible_os_family }}.yml'
+
+- name: 'NTP | Define service name'
+  set_fact:
+    ntp_service_name: '{{ ntp_default_service_name }}'
+  when: 'not ntp_service_name'
+
+- name: 'NTP | Define packages'
+  set_fact:
+    ntp_packages: '{{ ntp_default_packages }}'
+  when: 'not ntp_packages'
+
+- import_tasks: 'install.yml'
+
+- import_tasks: 'configure.yml'
+
+- import_tasks: 'service.yml'
+    
