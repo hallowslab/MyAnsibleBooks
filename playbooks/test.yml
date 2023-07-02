@@ -1,17 +1,30 @@
 - name: Debug Distribution
-  hosts: all
+  hosts: vms
   gather_facts: true
+  become: true
 
   tasks:
-    - name: Display Distribution
+    - name: Display guest info
       debug:
-        var: ansible_distribution
+        msg: "Family/Distribuition: {{ ansible_os_family }}/{{ ansible_distribution }} | Remote user: {{ machine_user }}"
     
-    - name: Display password
+    - name: Whoami user
+      become_user: "{{ machine_user }}"
+      command: whoami
+      register: whoami_user
+      changed_when: false
+
+    - name: Whoami root
+      command: whoami
+      register: whoami_root
+      changed_when: false
+
+    - name: Display users
       debug:
-        var: ansible_become_password
-      
-    - name: Get crons
+        msg: "whoami_user: {{ whoami_user.stdout }}, whoami_root: {{ whoami_root.stdout }}"
+
+    - name: Get user crons
+      become_user: "{{ machine_user }}"
       command: crontab -l
       register: existing_crons
       changed_when: false
@@ -23,7 +36,6 @@
       when: existing_crons is succeeded
     
     - name: Get root crons
-      become: true
       command: crontab -l
       register: existing_root_crons
       changed_when: false
@@ -32,7 +44,7 @@
     - name: Does not have rkhunter update
       debug:
         msg: Does not have rkhunter update cronjob
-      when: (existing_root_crons is succeeded and not existing_root_crons.stdout_lines is search("rkhunter --cronjob --update --quiet")) or existing_root_crons.stderr == "no crontab for root"
+      when: (existing_root_crons is succeeded and not existing_root_crons.stdout_lines is search("rkhunter --cronjob --update --quiet")) or existing_root_crons.stderr is search("no crontab for root")
 
     - name: Has clamdscan
       debug:

@@ -20,6 +20,11 @@ ansible-playbook playbooks/test.yml -i inventory/main.yml
 ansible-playbook --vault-id @prompt playbooks/test.yml -i inventory/main.yml
 ```
 
+- Passing variables
+```
+ansible-playbook -e "remote_user=myuser" playbooks/test.yml -i inventory/main.yml
+```
+
 ### Buiding & running the docker images
 
 - Running the images in the background
@@ -31,3 +36,14 @@ docker-compose up --build -d
 ```
 docker-compose down --remove-orphans
 ```
+
+### Dev notes:
+
+#### VM Management | Restoring snapshots
+
+- Identify the VM names and write them in a text file one per line
+- Use the script provided in script/manage_guests.pl
+- Parameters are `manage_guests.pl FILENAME ACTION OPTIONAL`
+- `FILENAME` is the name of the file with the guests, `ACTION` can be `start` `stop` or `restore`
+- `restore` is the only one that supports `OPTIONAL` and it's for the snapshot name
+
