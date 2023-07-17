@@ -1,0 +1,11 @@
+- name: Update all packages
+  hosts: vms
+  gather_facts: true
+  tags:
+    - update
+
+  tasks:
+    - name: Include upgrade tasks
+      include_tasks: 'tasks/upgrade.yml'
+
+    

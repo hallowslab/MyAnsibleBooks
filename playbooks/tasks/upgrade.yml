@@ -1,36 +1,60 @@
 ---
-- name: Upgrade DEBIAN packages
-  when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+- name: Update DEBIAN packages
+  when: ansible_os_family == 'Debian' and ansible_user == 'me'
   become: true
-  ansible.builtin.apt:
+  apt:
     name: "*"
     state: latest
-    update_cache: true
+    update_cache: yes
+  async: 3600
+  poll: 0
+  register: _debian_upgrade
 
-- name: Upgrade CENTOS packages
-  when: ansible_distribution == 'CentOS'
+- name: 'Update RedHat packages'
+  when: ansible_os_family == 'RedHat' and ansible_user == 'me'
   become: true
-  ansible.builtin.yum:
-    name: "*"
+  dnf:
+    name: '*'
     state: latest
-    update_cache: true
+  async: 3600
+  poll: 0
+  register: _rhel_upgrade
 
-- name: Upgrade FEDORA packages
-  when: ansible_distribuition == 'Fedora'
-  ansible.builtin.dnf:
-    name: "*"
-    state: latest
-
-- name: Upgrade ARCH packages
-  when: ansible_distribuition == 'ArchLinux'
+- name: Update ARCH packages
+  when: ansible_os_family == 'Archlinux' and ansible_user == 'me'
   become: true
   community.general.pacman:
     update_cache: true
-    upgrade: yes
+    upgrade: true
+  async: 3600
+  poll: 0
+  register: _arch_upgrade
+    
+- name: 'Update Suse packages'
+  when: ansible_os_family == 'Suse' and ansible_user == 'me'
+  become: true
+  community.general.zypper:
+    name: '*'
+    state: latest
+  async: 3600
+  poll: 0
+  register: _suse_upgrade
 
-- name: Upgrade ALPINE packages
-  when: ansible_distribution == 'Alpine'
+- name: 'Update Alpine packages'
+  when: ansible_os_family == 'Alpine'
   become: true
   community.general.apk:
-    upgrade: yes
     update_cache: true
+    upgrade: true
+  async: 3600
+  poll: 0
+  register: _alpine_upgrade
+
+- async_status:
+    jid: "{{ item.ansible_job_id }}"
+  loop:
+    - "{{ _alpine_upgrade }}"
+  register: job_result
+  until: job_result.finished
+  retries: 30
+  delay: 30
