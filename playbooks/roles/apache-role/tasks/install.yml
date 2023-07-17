@@ -1,37 +1,30 @@
 ---
-- name: 'NTP | Install Debian packages'
+# Installation steps for playbooks/roles/apache-role
+- name: 'Apache | Install Debian packages'
   when: ansible_os_family == 'Debian'
   become: true
   apt:
     name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
     state: '{{ item.state | default(omit) }}'
-  loop: '{{ ntp_packages }}'
+  loop: '{{ apache_packages }}'
 
-- name: 'NTP | Install CENTOS packages'
-  when: ansible_distribuition == 'CentOS'
-  become: true
-  yum:
-    name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
-    state: '{{ item.state | default(omit) }}'
-  loop: '{{ ntp_packages }}'
-
-- name: 'NTP | Install FEDORA packages'
-  when: ansible_distribuition == 'Fedora'
+- name: 'Apache | Install RedHat packages'
+  when: ansible_os_family == 'RedHat'
   become: true
   dnf:
     name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
     state: '{{ item.state | default(omit) }}'
-  loop: '{{ ntp_packages }}'
+  loop: '{{ apache_packages }}'
 
-- name: Install ARCH package
+- name: 'Apache | Install Archlinux package'
   when: ansible_os_family == 'Archlinux'
   become: true
   community.general.pacman:
     name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
     state: '{{ item.state | default(omit) }}'
-  loop: '{{ ntp_packages }}'
+  loop: '{{ apache_packages }}'
 
-- name: Install ALPINE package
+- name: 'Apache | Install Alpine package'
   when: ansible_os_family == 'Alpine'
   become: true
   community.general.apk:
@@ -39,4 +32,12 @@
     state: '{{ item.state | default(omit) }}'
     upgrade: '{{ item.upgrade | default(omit) }}'
     no_cache: True # Alpine on docker seems to require this
-  loop: '{{ ntp_packages }}'
+  loop: '{{ apache_packages }}'
+
+- name: 'Apache | Install Suse package'
+  when: ansible_os_family == 'Suse'
+  become: true
+  community.general.zypper:
+    name: '{{ item.name if item.version is not defined else item.name + "=" + item.version }}'
+    state: '{{ item.state | default(omit) }}'
+  loop: '{{ apache_packages }}'

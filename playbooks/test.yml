@@ -6,10 +6,10 @@
   tasks:
     - name: Display guest info
       debug:
-        msg: "Family/Distribuition: {{ ansible_os_family }}/{{ ansible_distribution }} | Remote user: {{ machine_user }}"
+        msg: "Family/Distribuition: {{ ansible_os_family }}/{{ ansible_distribution }} | Remote user: {{ admin_user }}"
     
     - name: Whoami user
-      become_user: "{{ machine_user }}"
+      become_user: "{{ admin_user }}"
       command: whoami
       register: whoami_user
       changed_when: false
@@ -24,7 +24,7 @@
         msg: "whoami_user: {{ whoami_user.stdout }}, whoami_root: {{ whoami_root.stdout }}"
 
     - name: Get user crons
-      become_user: "{{ machine_user }}"
+      become_user: "{{ admin_user }}"
       command: crontab -l
       register: existing_crons
       changed_when: false

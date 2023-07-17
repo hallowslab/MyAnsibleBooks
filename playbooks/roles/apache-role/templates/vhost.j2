@@ -1,0 +1,19 @@
+<VirtualHost *:80>
+    ServerAdmin webmaster@localhost
+    ServerName localhost
+    ServerAlias www.localhost
+    DocumentRoot "/var/www/html"
+
+    <Directory "/var/www/html">
+        Options Indexes FollowSymLinks
+        AllowOverride None
+        Require all granted
+    </Directory>
+    {% if apache_service_name == 'apache2' %}
+    ErrorLog {{ apache_log_directory }}/error.log
+    CustomLog {{ apache_log_directory }}/access.log combined
+    {% elif apache_service_name == 'httpd' %}
+    ErrorLog {{ httpd_log_directory }}/error.log
+    CustomLog {{ httpd_log_directory }}/access.log combined
+    {% endif %}
+</VirtualHost>

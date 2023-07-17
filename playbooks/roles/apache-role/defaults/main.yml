@@ -1,0 +1,15 @@
+---
+# defaults file for playbooks/roles/apache-role
+apache_packages:
+apache_service_name:
+apache_user:
+mpm_module: 'event'
+apache_service_state: 'started'
+apache_service_enabled: yes
+apache_log_directory: '/var/log/apache2'
+httpd_log_directory: '/var/log/httpd'
+
+
+apache_conf_template: 'apache2.j2'
+httpd_conf_template: 'httpd.j2'
+vhost_template: 'vhost.j2'

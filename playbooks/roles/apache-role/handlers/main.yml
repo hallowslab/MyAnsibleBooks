@@ -1,0 +1,7 @@
+---
+# handlers file for playbooks/roles/apache-role
+- name: 'Apache | Service restart'
+  become: yes
+  service:
+    name: '{{ apache_service_name }}'
+    state: restarted

@@ -1,6 +1,7 @@
 ---
+# vars file for ntp-role
 ntp_default_packages:
-  - name: 'ntp'
-  - name: 'tzdata'
+  - { name: ntp, state: present }
+  - { name: tzdata, state: present}
 
 ntp_default_service_name: 'ntp'

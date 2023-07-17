@@ -1,7 +1,0 @@
----
-# vars file for ntp-role
-ntp_default_packages:
-  - name: 'ntp'
-  - name: 'tzdata'
-
-ntp_default_service_name: 'ntpd'

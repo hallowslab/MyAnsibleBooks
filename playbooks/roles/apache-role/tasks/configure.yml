@@ -1,0 +1,155 @@
+---
+# Configuration steps for playbooks/roles/apache-role
+- name: 'Apache | Create domain directory'
+  become: yes
+  file:
+    path: '/var/www/html'
+    state: 'directory'
+    owner: '{{ apache_user }}'
+    group: '{{ apache_user }}'
+    mode: '0755'
+    recurse: yes
+
+- name: 'Apache | Check selinux exists'
+  become: yes
+  command: sestatus
+  register: sestatus
+  ignore_errors: yes
+  
+- name: 'Apache | Allow selinux'
+  sefcontext:
+    target: '/var/www/html'
+    setype: httpd_sys_rw_content_t
+    state: present
+  when: sestatus is succeeded
+
+- name: 'Apache | Create index.html'
+  become: yes
+  copy:
+    src: files/index.html
+    dest: /var/www/html/index.html
+    owner: '{{ apache_user }}'
+    group: '{{ apache_user }}'
+    mode: '0644'
+
+- name: 'Apache | Create sites-available'
+  become: yes
+  file:
+    path: '/etc/apache2/sites-available'
+    state: 'directory'
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: 'Apache | Create sites-enabled'
+  become: yes
+  file:
+    path: '/etc/apache2/sites-enabled'
+    state: 'directory'
+    owner: root
+    group: root
+    mode: '0755'
+
+- name: 'Apache | Create VHOST'
+  become: yes
+  template:
+    src: '{{ vhost_template }}'
+    dest: '/etc/apache2/sites-available/mywebsite.conf'
+    owner: root
+    group: root
+    mode: '0644'
+
+- name: 'Apache | Create DEBIAN specific configuration'
+  become: yes
+  template:
+    src: '{{ apache_conf_template }}'
+    dest: '/etc/apache2/apache2.conf'
+    owner: root
+    group: root
+    mode: '0644'
+  when: apache_service_name == 'apache2'
+
+- name: 'Apache | Create httpd configuration directory'
+  become: yes
+  file:
+    path: '/etc/httpd/conf/'
+    state: 'directory'
+    owner: root
+    group: root
+    mode: '0755'
+  when: apache_service_name == 'httpd'
+
+- name: 'Apache | Create httpd configuration directory for modules'
+  become: yes
+  file:
+    path: '/etc/httpd/conf.modules.d'
+    state: directory
+    owner: root
+    group: root
+    mode: '0755'
+  when: apache_service_name == 'httpd'
+
+- name: 'Apache | Create httpd VHOSTS directory'
+  become: yes
+  file:
+    path: '/etc/httpd/conf.d/'
+    state: 'directory'
+    owner: root
+    group: root
+    mode: '0755'
+  when: apache_service_name == 'httpd'
+
+- name: 'Apache | Create main configuration'
+  become: yes
+  template:
+    src: '{{ httpd_conf_template }}'
+    dest: '/etc/httpd/conf/httpd.conf'
+    owner: root
+    group: root
+    mode: '0644'
+  when: apache_service_name == 'httpd'
+
+- name: 'Apache | Create apache2 log directory'
+  become: yes
+  file:
+    path: '{{ apache_log_directory }}'
+    state: 'directory'
+    owner: root
+    group: root
+    mode: '0755'
+  when: apache_service_name == 'httpd'
+
+- name: 'Apache | Create httpd log directory'
+  become: yes
+  file:
+    path: '{{ httpd_log_directory }}'
+    state: 'directory'
+    owner: root
+    group: root
+    mode: '0755'
+  when: apache_service_name == 'httpd'
+
+- name: 'Apache | RHEL add firewall exception'
+  become: yes
+  shell: |
+    firewall-cmd --zone=public --add-service=http --permanent &&
+    firewall-cmd --zone=public --add-service=https --permanent &&
+    firewall-cmd --reload
+  when: ansible_os_family == 'RedHat' or ansible_os_family == 'Suse'
+
+- name: 'Apache | Remove link to default website'
+  become: yes
+  file:
+    path: '/etc/apache2/sites-enabled/000-default.conf'
+    state: absent
+  notify: 'Apache | Service restart'
+
+- name: 'Apache | Link user website'
+  become: yes
+  file:
+    src: /etc/apache2/sites-available/mywebsite.conf
+    path: /etc/apache2/sites-enabled/mywebsite.conf
+    state: link
+    force: yes
+  notify: 'Apache | Service restart'
+
