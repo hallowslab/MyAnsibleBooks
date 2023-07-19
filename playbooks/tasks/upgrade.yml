@@ -1,6 +1,6 @@
 ---
-- name: Update DEBIAN packages
-  when: ansible_os_family == 'Debian' and ansible_user == 'me'
+- name: 'Update Debian packages'
+  when: ansible_os_family == 'Debian'
   become: true
   apt:
     name: "*"
@@ -11,7 +11,7 @@
   register: _debian_upgrade
 
 - name: 'Update RedHat packages'
-  when: ansible_os_family == 'RedHat' and ansible_user == 'me'
+  when: ansible_os_family == 'RedHat'
   become: true
   dnf:
     name: '*'
@@ -20,8 +20,8 @@
   poll: 0
   register: _rhel_upgrade
 
-- name: Update ARCH packages
-  when: ansible_os_family == 'Archlinux' and ansible_user == 'me'
+- name: 'Update Archlinux packages'
+  when: ansible_os_family == 'Archlinux'
   become: true
   community.general.pacman:
     update_cache: true
@@ -31,7 +31,7 @@
   register: _arch_upgrade
     
 - name: 'Update Suse packages'
-  when: ansible_os_family == 'Suse' and ansible_user == 'me'
+  when: ansible_os_family == 'Suse'
   become: true
   community.general.zypper:
     name: '*'
@@ -50,11 +50,21 @@
   poll: 0
   register: _alpine_upgrade
 
-- async_status:
+- name: 'Check async jobs status'
+  async_status:
     jid: "{{ item.ansible_job_id }}"
   loop:
     - "{{ _alpine_upgrade }}"
+    - "{{ _arch_upgrade }}"
+    - "{{ _rhel_upgrade }}"
+    - "{{ _suse_upgrade }}"
+    - "{{ _debian_upgrade }}"
   register: job_result
   until: job_result.finished
-  retries: 30
-  delay: 30
+  retries: 2
+  delay: 1800
+  when: item.ansible_job_id is defined
+
+- name: Check RHEL Upgrade status
+  debug:
+    msg: "{{ _rhel_upgrade }}"
