@@ -1,0 +1,8 @@
+---
+# vars file for playbooks/roles/rkhunter-role
+apache_default_packages:
+  - { name: apache2, state: present }
+
+apache_default_service_name: 'apache2'
+
+apache_default_user: 'wwwrun'

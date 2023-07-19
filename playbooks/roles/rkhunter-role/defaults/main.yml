@@ -1,0 +1,3 @@
+rkhunter_diag_scan: "no"
+rkhunter_allow_ssh_protocol_v1: 0
+rkhunter_allow_ssh_root_login: "no"

@@ -1,0 +1,7 @@
+- name: test command
+  command: echo 1
+  register: echo_var
+
+- name: debug
+  debug:
+    var: echo_var

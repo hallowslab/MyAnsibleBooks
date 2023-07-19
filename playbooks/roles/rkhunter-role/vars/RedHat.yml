@@ -1,0 +1,8 @@
+---
+# vars file for playbooks/roles/rkhunter-role
+rkhunter_default_packages:
+  - { name: rkhunter, state: present }
+
+rkhunter_default_service_name: 'httpd'
+
+rkhunter_default_user: 'apache'
