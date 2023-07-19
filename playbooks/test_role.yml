@@ -1,0 +1,16 @@
+- name: Debug Distribution
+  hosts: vms
+  gather_facts: true
+
+  tasks:
+    - name: Set facts
+      set_fact:
+        distribution: '{{ ansible_distribution }}'
+        family: '{{ ansible_os_family }}'
+
+    - name: Test role
+      include_role:
+        name: rkhunter-role
+      vars:
+        ansible_distribution: '{{ distribution }}'
+        ansible_os_family: '{{ family }}'

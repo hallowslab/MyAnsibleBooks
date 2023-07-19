@@ -1,3 +1,7 @@
-rkhunter_diag_scan: "no"
+rkhunter_packages: 
+
 rkhunter_allow_ssh_protocol_v1: 0
-rkhunter_allow_ssh_root_login: "no"
+rkhunter_allow_ssh_root_login: 'no'
+rkhunter_install_cron: false
+rkhunter_mail_on_warning: false
+rkhunter_mail_destination: '"root@localhost"'

@@ -1,7 +1,14 @@
-- name: test command
-  command: echo 1
-  register: echo_var
+---
+# tasks file for playbooks/roles/rkhunter-role
 
-- name: debug
-  debug:
-    var: echo_var
+- name: 'Rkhunter | Include OS-specific variables.'
+  include_vars: '{{ ansible_os_family }}.yml'
+
+- name: 'Rkhunter | Define packages'
+  set_fact:
+    rkhunter_packages: '{{ rkhunter_default_packages }}'
+  when: 'not rkhunter_packages'
+
+- import_tasks: 'install.yml'
+
+- import_tasks: 'configure.yml'

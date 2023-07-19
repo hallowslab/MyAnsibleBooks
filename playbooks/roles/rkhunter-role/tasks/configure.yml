@@ -1,0 +1,38 @@
+---
+# Configuration steps for playbooks/roles/ntp-role
+- name: 'Rkhunter | Verify version'
+  become: yes
+  command: rkhunter --versioncheck
+  register: _rkhunter_version
+
+- name: 'Rkhunter | Display version'
+  debug:
+    msg: '{{ _rkhunter_version }}'
+
+- name: 'Rkhunter | Update data files'
+  become: yes
+  command: rkhunter --update
+
+- name: 'Rkhunter | Update the file properties database'
+  become: yes
+  command: rkhunter --propupd
+
+- name: 'Rkhunter | Check existing cronjobs'
+  become: yes
+  command: crontab -l
+  register: existing_crons
+  changed_when: false
+  ignore_errors: true
+
+- name: 'Rkhunter | Display existing crons'
+  debug:
+    msg: '{{ existing_crons }}'
+
+- name: Check rkhunter --update in crontab
+  become: true
+  cron:
+    name: "rkhupdate"
+    minute: "0"
+    hour: "0"
+    job: "rkhunter --cronjob --update --quiet"
+  when: existing_crons is succeeded and not existing_crons.stdout_lines is search("rkhunter --cronjob") and rkhunter_install_cron is true

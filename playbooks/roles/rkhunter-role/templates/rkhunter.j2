@@ -2,6 +2,11 @@ LOGFILE=/var/log/rkhunter.log
 AUTO_X_DETECT=1
 ENABLE_TESTS=ALL
 DISABLE_TESTS=suspscan hidden_ports hidden_procs deleted_files packet_cap_apps apps
+ALLOW_SSH_ROOT_USER={{ rkhunter_allow_ssh_root_login }}
+ALLOW_SSH_PROT_V1={{ rkhunter_allow_ssh_protocol_v1 }}
+{% if rkhunter_mail_on_warning is true %}
+MAIL-ON-WARNING={{ rkhunter_mail_destination }}
+{% endif %}
 
 {% if ansible_os_family == 'Archlinux' %}
 SCRIPTWHITELIST=/usr/bin/egrep
