@@ -1,0 +1,8 @@
+---
+# Enable Apache service for playbooks/roles/vaultwarden-role
+- name: 'Vaultwarden | Enable Apache service.'
+  become: yes
+  service:
+    name: '{{ apache_service_name }}'
+    state: '{{ apache_service_state }}'
+    enabled: '{{ apache_service_enabled }}'

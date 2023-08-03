@@ -1,0 +1,23 @@
+---
+# tasks file for playbooks/roles/vaultwarden-role
+
+- name: 'Vaultwarden | Include OS-specific variables.'
+  include_vars: '{{ ansible_os_family }}.yml'
+
+- name: 'Vaultwarden | Define apache service name'
+  set_fact:
+    apache_service_name: '{{ apache_default_service_name }}'
+  when: 'not apache_service_name'
+
+- name: 'Vaultwarden | Define user'
+  set_fact:
+    apache_user: '{{ apache_default_user }}'
+  when: 'not apache_user'
+    
+
+- import_tasks: 'install.yml'
+
+- import_tasks: 'configure.yml'
+
+- import_tasks: 'service.yml'
+    

@@ -1,0 +1,26 @@
+<VirtualHost *:80>
+    ServerName {{ webvault_vhost_servername }}
+    Redirect permanent / https://{{ webvault_vhost_servername }}
+</VirtualHost>
+
+
+<VirtualHost *:443>
+    ServerName {{ webvault_vhost_servername }}
+    DocumentRoot "{{ webvault_root_directory }}"
+
+    {% if apache_service_name == 'apache2' %}
+    ErrorLog {{ apache_log_directory }}/vaultwarden_error.log
+    CustomLog {{ apache_log_directory }}/vaultwarden_access.log combined
+    {% elif apache_service_name == 'httpd' %}
+    ErrorLog {{ httpd_log_directory }}/vaultwarden_error.log
+    CustomLog {{ httpd_log_directory }}/vaultwarden_access.log combined
+    {% endif %}
+
+    SSLEngine on
+    SSLCertificateFile {{ ssl_certificate_file }}
+    SSLCertificateKeyFile {{ ssl_certificate_key }}
+
+    ProxyPreserveHost On
+    ProxyPass / http://localhost:8200/
+    ProxyPassReverse / http://localhost:8200/
+</VirtualHost>

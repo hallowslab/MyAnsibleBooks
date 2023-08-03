@@ -1,0 +1,4 @@
+---
+# vars file for playbooks/roles/vaultwarden-role
+apache_default_service_name: 'apache2'
+apache_default_user: 'wwwrun'

@@ -1,0 +1,7 @@
+---
+# handlers file for playbooks/roles/vaultwarden-role
+- name: 'Vaultwarden | Apache service restart'
+  become: yes
+  service:
+    name: '{{ apache_service_name }}'
+    state: restarted

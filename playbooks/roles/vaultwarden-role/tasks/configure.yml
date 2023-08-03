@@ -1,0 +1,32 @@
+---
+# Configuration steps for playbooks/roles/vaultwarden-role
+- name: Pull Vaultwarden Docker image
+  docker_image:
+    name: vaultwarden/server:alpine
+
+- name: Create the Vaultwarden Docker container
+  docker_container:
+    name: vw
+    image: vaultwarden/server:alpine
+    state: started
+    detach: yes
+
+- name: Copy Vaultwarden directory from the container
+  docker_container:
+    name: vw
+    copy: yes
+    src: /vaultwarden
+    dest: /path/to/local/vaultwarden
+
+- name: Copy web-vault directory from the container
+  docker_container:
+    name: vw
+    copy: yes
+    src: /web-vault
+    dest: /path/to/local/web-vault
+
+- name: Remove the temporary Docker container
+  docker_container:
+    name: vw
+    state: absent
+

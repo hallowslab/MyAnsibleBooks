@@ -1,0 +1,4 @@
+---
+# vars file for playbooks/roles/apache-role
+apache_default_service_name: 'httpd'
+apache_default_user: 'http'

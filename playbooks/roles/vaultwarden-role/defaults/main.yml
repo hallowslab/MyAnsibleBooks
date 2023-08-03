@@ -1,0 +1,14 @@
+---
+# defaults file for playbooks/roles/vaultwarden-role
+
+vaultwarden_user: 'vaultwarden'
+vaultwarden_data_directory: '/home/{{ vaultwarden_user }}/data'
+
+apache_service_name:
+apache_user:
+ssl_certificate_file: 
+ssl_certificate_key: 
+
+webvault_root_directory: '/var/www/vaultwarden'
+webvault_vhost_servername: 'vaultwarden.internal'
+webvault_vhost_template: 'vaultwarden.j2'
