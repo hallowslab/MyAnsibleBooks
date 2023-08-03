@@ -47,3 +47,7 @@ docker-compose down --remove-orphans
 - `FILENAME` is the name of the file with the guests, `ACTION` can be `start` `stop` or `restore`
 - `restore` is the only one that supports `OPTIONAL` and it's for the snapshot name
 
+#### Creating new roles
+
+* `ansible-galaxy init playbooks/roles/service-role`
+

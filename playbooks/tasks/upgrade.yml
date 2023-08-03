@@ -6,9 +6,7 @@
     name: "*"
     state: latest
     update_cache: yes
-  async: 3600
-  poll: 0
-  register: _debian_upgrade
+
 
 - name: 'Update RedHat packages'
   when: ansible_os_family == 'RedHat'
@@ -16,9 +14,7 @@
   dnf:
     name: '*'
     state: latest
-  async: 3600
-  poll: 0
-  register: _rhel_upgrade
+
 
 - name: 'Update Archlinux packages'
   when: ansible_os_family == 'Archlinux'
@@ -26,9 +22,7 @@
   community.general.pacman:
     update_cache: true
     upgrade: true
-  async: 3600
-  poll: 0
-  register: _arch_upgrade
+
     
 - name: 'Update Suse packages'
   when: ansible_os_family == 'Suse'
@@ -36,9 +30,7 @@
   community.general.zypper:
     name: '*'
     state: latest
-  async: 3600
-  poll: 0
-  register: _suse_upgrade
+
 
 - name: 'Update Alpine packages'
   when: ansible_os_family == 'Alpine'
@@ -46,25 +38,3 @@
   community.general.apk:
     update_cache: true
     upgrade: true
-  async: 3600
-  poll: 0
-  register: _alpine_upgrade
-
-- name: 'Check async jobs status'
-  async_status:
-    jid: "{{ item.ansible_job_id }}"
-  loop:
-    - "{{ _alpine_upgrade }}"
-    - "{{ _arch_upgrade }}"
-    - "{{ _rhel_upgrade }}"
-    - "{{ _suse_upgrade }}"
-    - "{{ _debian_upgrade }}"
-  register: job_result
-  until: job_result.finished
-  retries: 2
-  delay: 1800
-  when: item.ansible_job_id is defined
-
-- name: Check RHEL Upgrade status
-  debug:
-    msg: "{{ _rhel_upgrade }}"
