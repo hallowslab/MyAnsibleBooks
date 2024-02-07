@@ -1,0 +1,85 @@
+- name: Sequential tasks for each host
+  hosts: all
+  gather_facts: true
+
+  tasks:
+    - name: Arch tasks
+      when: ansible_distribuition == 'ArchLinux'
+      tags:
+        - localhost
+      block:
+        - name: Upgrade ARCH packages
+          become: true
+          community.general.pacman:
+            update_cache: true
+            upgrade: true
+
+        - name: Install cronie
+          become: true
+          community.general.pacman:
+            name: cronie
+            state: latest            
+
+        - name: Install rkhunter
+          become: true
+          community.general.pacman:
+            name: rkhunter
+            state: latest
+
+        - name: Update file properties database
+          become: true
+          command: rkhunter --propupd
+
+        - name: Check existing cronjobs
+          become: true
+          command: crontab -l
+          register: existing_crons
+          changed_when: false
+          ignore_errors: true
+        
+        - name: Check rkhunter --update in crontab
+          become: true
+          cron:
+            name: "rkhupdate"
+            minute: "0"
+            hour: "0"
+            job: "rkhunter --cronjob --update --quiet"
+          when: existing_crons is succeeded and not existing_crons.stdout_lines is search("rkhunter --update")
+    
+
+    - name: Debian tasks
+      when: ansible_distribution == 'Debian' or ansible_distribution == 'Ubuntu'
+      tags:
+        - localnet
+      block:
+        - name: Upgrade DEBIAN packages
+          become: true
+          ansible.builtin.apt:
+            name: "*"
+            state: latest
+            update_cache: yes
+
+        - name: Install rkhunter
+          become: true
+          ansible.builtin.apt:
+            name: rkhunter
+            state: latest
+
+        - name: Update file properties database
+          become: true
+          command: rkhunter --propupd
+        
+        - name: Check existing cronjobs
+          command: crontab -l
+          register: existing_crons
+          changed_when: false
+          ignore_errors: true
+          
+        - name: Check rkhunter --update in crontab
+          become: true
+          cron:
+            name: "rkhupdate"
+            minute: "0"
+            hour: "0"
+            job: "rkhunter --cronjob --update --quiet"
+          when: existing_crons is succeeded and not existing_crons.stdout_lines is search("rkhunter --update")

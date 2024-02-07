@@ -1,2 +1,6 @@
 ---
 # Installation steps for playbooks/roles/vaultwarden-role
+- name: 'Vaultwarden | Verify DockerSDK for python'
+  pip:
+    name: docker
+    state: present

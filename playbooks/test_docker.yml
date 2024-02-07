@@ -1,0 +1,91 @@
+- name: Test docker
+  hosts: vms
+  gather_facts: true
+
+  tasks:
+    - name: Check if docker is installed
+      command: "docker --version"
+      ignore_errors: yes
+      register: docker_check
+
+    - name: Check if pip is installed
+      command: "pip --version"
+      ignore_errors: yes
+      register: pip_check
+
+    - name: Download pip if not present
+      get_url:
+        url: https://bootstrap.pypa.io/get-pip.py
+        dest: /tmp/get-pip.py
+      when: pip_check.rc != 0 and ansible_os_family != 'Archlinux'
+
+    - name: Install pip if not present
+      command: "python3 /tmp/get-pip.py"
+      args:
+        creates: /usr/local/bin/pip
+      when: pip_check.rc != 0 and ansible_os_family != 'Archlinux'
+
+    - name: Install python dependencies if not present - Archlinux
+      become: true
+      community.general.pacman:
+        name: 
+          - python-pip
+          - python-setuptools
+          - python-docker
+        state: present
+        update_cache: true
+      when: pip_check != 0 and ansible_os_family == 'Archlinux'
+
+    - name: Install dockerSDK module
+      when: ansible_os_family != 'Archlinux'
+      pip:
+        name: docker
+        state: present
+
+    - name : Get docker install script
+      when: (ansible_distribution == 'Ubuntu' or ansible_distribution == 'CentOS' or ansible_distribution == 'Fedora') and docker_check.rc != 0
+      become: yes
+      command: curl -fsSL https://get.docker.com -o get-docker.sh
+    
+    - name: Install docker
+      when: (ansible_distribution == 'Ubuntu' or ansible_distribution == 'CentOS' or ansible_distribution == 'Fedora') and docker_check.rc != 0
+      become: yes
+      command: sh ./get-docker.sh --dry-run
+
+    - name: 'Install docker - Archlinux'
+      when: ansible_os_family == 'Archlinux' and docker_check.rc != 0
+      become: true
+      community.general.pacman:
+        name: 'docker'
+        state: 'present'
+    
+    - name: Ensure Docker service is started
+      systemd:
+        name: docker
+        state: started
+        enabled: yes
+
+    - name: Pull Vaultwarden Docker image
+      docker_image:
+        name: vaultwarden/server:alpine
+        source: pull
+
+    - name: Create the Vaultwarden Docker container
+      docker_container:
+        name: vw
+        image: vaultwarden/server:alpine
+        state: started
+        detach: yes
+
+    - name: Copy Vaultwarden directory from the container
+      command: docker cp vw:/vaultwarden /path/to/local/vaultwarden
+
+    - name: Copy web-vault directory from the container
+      command: docker cp vw:/web-vault /path/to/local/web-vault
+
+    - name: Remove the temporary Docker container
+      docker_container:
+        name: vw
+        state: absent
+
+

@@ -1,0 +1,14 @@
+- name: Check if pip is installed
+  command: "pip --version"
+  ignore_errors: yes
+  register: pip_check
+  
+- name: Check if docker is installed
+  command: "docker --version"
+  ignore_errors: yes
+  register: docker_check
+
+- name: Does not meet requirements
+  debug:
+    msg: "Requirements not met\nHas docker: {{ docker_check }}\nHas pip: {{ pip_check }}"
+  when: pip_check.rc == 0 and docker_check.rc == 0
